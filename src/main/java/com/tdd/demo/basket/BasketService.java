@@ -17,6 +17,7 @@ public class BasketService {
         return newBasketId;
     }
 
+    //TODO: returning the map creates side effect possibility - refactor
     public Map<UUID, BasketItem> addItem(UUID basketId, BasketItem item) {
         var basket = basketCollection.get(basketId);
         if (basket == null) {
