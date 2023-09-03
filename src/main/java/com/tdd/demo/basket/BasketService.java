@@ -22,7 +22,9 @@ public class BasketService {
         if (basket == null) {
             throw new RuntimeException("Basket Not Found");
         }
-        basket.put(item.getProduct().getProductId(), item);
+        var productId = item.getProduct().getProductId();
+        basket.computeIfPresent(productId, (key, val)-> new BasketItem(val.getProduct(), val.getQuantity()+item.getQuantity()));
+        basket.putIfAbsent(productId, item);
         return basket;
     }
 

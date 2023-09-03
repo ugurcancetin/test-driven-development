@@ -7,5 +7,5 @@ import lombok.Getter;
 @Getter
 public class BasketItem {
     private Product product;
-    private short quantity;
+    private int quantity;
 }

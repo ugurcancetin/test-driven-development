@@ -62,7 +62,6 @@ public class BasketServiceTest {
         var firstContent = basketService.addItem(basketId, basketItem);
         var secondContent = basketService.addItem(basketId, basketItem);
         assertEquals(2, secondContent.get(basketItem.getProduct().getProductId()).getQuantity());
-
     }
 
     private BasketItem createSingleBasketItem() {
