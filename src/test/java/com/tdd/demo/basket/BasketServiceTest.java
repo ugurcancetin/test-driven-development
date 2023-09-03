@@ -6,10 +6,7 @@ import com.tdd.demo.basket.model.Product;
 import org.junit.jupiter.api.*;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,20 +25,20 @@ public class BasketServiceTest {
     @DisplayName("Add an item into the basket")
     @Test
     @Order(2)
-    void when_addNewItemIntoTheBasket_thenReturn_newBasketContent(){
+    void when_addNewItemIntoTheBasket_thenReturn_newBasketContent() {
         var basketItem = createSingleBasketItem();
         var basketId = basketService.createBasket();
-        var basketContent = basketService.addItem(basketId,  basketItem);
+        var basketContent = basketService.addItem(basketId, basketItem);
         assertFalse(basketContent.isEmpty());
-        assertTrue(basketContent.contains(basketItem));
+        assertTrue(basketContent.containsValue(basketItem));
     }
 
     @DisplayName("Add an item into the basket that doesn't exist")
     @Test
     @Order(3)
-    void when_addNewItemIntoTheBasketThatDoesntExist_thenThrow_BasketNotFoundException(){
+    void when_addNewItemIntoTheBasketThatDoesntExist_thenThrow_BasketNotFoundException() {
         assertThrows(RuntimeException.class,
-                () ->  basketService.addItem(UUID.randomUUID(), createSingleBasketItem()));
+                () -> basketService.addItem(UUID.randomUUID(), createSingleBasketItem()));
     }
 
     @DisplayName("Add Multiple Products into the basket at once")
@@ -51,7 +48,21 @@ public class BasketServiceTest {
         var basketId = basketService.createBasket();
         var basketItems = createMultipleBasketItems();
         var basketContent = basketService.addItems(basketId, basketItems);
-        assertTrue(basketContent.containsAll(basketItems));
+        assertFalse(basketContent.isEmpty());
+        basketContent.values()
+                .forEach(basketItem -> assertTrue(basketItems.containsValue(basketItem)));
+    }
+
+    @DisplayName("Add the same product twice")
+    @Test
+    @Order(5)
+    void when_addingTheSameProductTwice_thenReturn_updatedBasketWithIncreaseQuantityOfTheProduct() {
+        var basketId = basketService.createBasket();
+        var basketItem = createSingleBasketItem();
+        var firstContent = basketService.addItem(basketId, basketItem);
+        var secondContent = basketService.addItem(basketId, basketItem);
+        assertEquals(2, secondContent.get(basketItem.getProduct().getProductId()).getQuantity());
+
     }
 
     private BasketItem createSingleBasketItem() {
@@ -59,15 +70,15 @@ public class BasketServiceTest {
         return new BasketItem(macBookPro, (short) 1);
     }
 
-    private Set<BasketItem> createMultipleBasketItems() {
+    private Map<UUID, BasketItem> createMultipleBasketItems() {
         var macBookPro = new Product(UUID.randomUUID(), "MacBook Pro", new BigDecimal(2500), Currency.DOLLAR);
         var iPhonePro = new Product(UUID.randomUUID(), "iPhone Pro", new BigDecimal(2000), Currency.DOLLAR);
         var macBookProBasketItem = new BasketItem(macBookPro, (short) 2);
         var iPhoneBasketItem = new BasketItem(iPhonePro, (short) 1);
 
-        var basketItems = new HashSet<BasketItem>();
-        basketItems.add(macBookProBasketItem);
-        basketItems.add(iPhoneBasketItem);
+        var basketItems = new HashMap<UUID, BasketItem>();
+        basketItems.put(macBookPro.getProductId(), macBookProBasketItem);
+        basketItems.put(iPhonePro.getProductId(), iPhoneBasketItem);
         return basketItems;
     }
 }

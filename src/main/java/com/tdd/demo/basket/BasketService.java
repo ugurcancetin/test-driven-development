@@ -9,26 +9,26 @@ import java.util.*;
 @Service
 @AllArgsConstructor
 public class BasketService {
-    Map<UUID, Set<BasketItem>> basketCollection;
+    Map<UUID, Map<UUID, BasketItem>> basketCollection;
 
     public UUID createBasket() {
         var newBasketId = UUID.randomUUID();
-        basketCollection.put(newBasketId, new HashSet<>());
+        basketCollection.put(newBasketId, new HashMap<>());
         return newBasketId;
     }
 
-    public Set<BasketItem> addItem(UUID basketId, BasketItem item) {
+    public Map<UUID, BasketItem> addItem(UUID basketId, BasketItem item) {
         var basket = basketCollection.get(basketId);
         if (basket == null) {
             throw new RuntimeException("Basket Not Found");
         }
-        basket.add(item);
+        basket.put(item.getProduct().getProductId(), item);
         return basket;
     }
 
-    public Set<BasketItem> addItems(UUID basketId, Set<BasketItem> basketItems){
+    public Map<UUID, BasketItem> addItems(UUID basketId, Map<UUID, BasketItem> basketItems){
         var basket = basketCollection.get(basketId);
-        basket.addAll(basketItems);
+        basket.putAll(basketItems);
         return basket;
     }
 }
