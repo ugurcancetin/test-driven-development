@@ -24,14 +24,24 @@ public class BasketService {
             throw new RuntimeException("Basket Not Found");
         }
         var productId = item.getProduct().getProductId();
-        basket.computeIfPresent(productId, (key, val)-> new BasketItem(val.getProduct(), val.getQuantity()+item.getQuantity()));
+        basket.computeIfPresent(productId, (key, val) -> new BasketItem(val.getProduct(), val.getQuantity() + item.getQuantity()));
         basket.putIfAbsent(productId, item);
         return basket;
     }
 
-    public Map<UUID, BasketItem> addItems(UUID basketId, Map<UUID, BasketItem> basketItems){
+    public Map<UUID, BasketItem> addItems(UUID basketId, Map<UUID, BasketItem> basketItems) {
         var basket = basketCollection.get(basketId);
-        basket.putAll(basketItems);
+        basketItems.keySet().forEach(basketItemId -> aggrateBasketItems(basketItems, basket, basketItemId));
         return basket;
+    }
+
+    private void aggrateBasketItems(Map<UUID, BasketItem> basketItems, Map<UUID, BasketItem> basket, UUID basketItemId) {
+        if (basket.containsKey(basketItemId)) {
+            var newQuantity = basket.get(basketItemId).getQuantity() + basketItems.get(basketItemId).getQuantity();
+            var newBasketItem = new BasketItem(basket.get(basketItemId).getProduct(), newQuantity);
+            basket.put(basketItemId, newBasketItem);
+        } else {
+            basket.put(basketItemId, basketItems.get(basketItemId));
+        }
     }
 }
