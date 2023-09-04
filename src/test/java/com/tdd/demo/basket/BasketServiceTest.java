@@ -59,9 +59,22 @@ public class BasketServiceTest {
     void when_addingTheSameProductTwice_thenReturn_updatedBasketWithIncreaseQuantityOfTheProduct() {
         var basketId = basketService.createBasket();
         var basketItem = createSingleBasketItem();
-        var firstContent = basketService.addItem(basketId, basketItem);
+        basketService.addItem(basketId, basketItem);
         var secondContent = basketService.addItem(basketId, basketItem);
         assertEquals(2, secondContent.get(basketItem.getProduct().getProductId()).getQuantity());
+    }
+
+    @DisplayName("Add multiple products to the basket twice")
+    @Test
+    @Order(6)
+    void when_addingMultipleProductsTwice_thenReturn_updatedBasketWithCorrectlyAggregatedContent() {
+        var basketId = basketService.createBasket();
+        var basketItems = createMultipleBasketItems();
+        basketService.addItems(basketId, basketItems);
+        var updatedBasketContent = basketService.addItems(basketId, basketItems);
+        assertEquals(Optional.of(6), updatedBasketContent.values().stream()
+                .map(BasketItem::getQuantity)
+                .reduce(Integer::sum));
     }
 
     private BasketItem createSingleBasketItem() {
