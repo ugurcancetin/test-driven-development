@@ -77,6 +77,19 @@ public class BasketServiceTest {
                 .reduce(Integer::sum));
     }
 
+    @DisplayName("Get the basket content to be displayed")
+    @Test
+    @Order(7)
+    void when_getBasketCalled_thenReturn_theCurrentBasketContent() {
+        var basketId = basketService.createBasket();
+        var basketItems = createMultipleBasketItems();
+        basketService.addItems(basketId, basketItems);
+        var basketContent = basketService.getBasket(basketId);
+        assertTrue(basketContent.values().stream().allMatch(basketItems::containsValue));
+        basketService.addItem(basketId, createSingleBasketItem());
+        assertFalse(basketContent.values().stream().allMatch(basketItems::containsValue));
+    }
+
     private BasketItem createSingleBasketItem() {
         Product macBookPro = new Product(UUID.randomUUID(), "MacBook Pro", new BigDecimal(1500), Currency.DOLLAR);
         return new BasketItem(macBookPro, (short) 1);
