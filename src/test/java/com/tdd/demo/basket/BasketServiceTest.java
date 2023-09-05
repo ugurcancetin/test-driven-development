@@ -93,6 +93,23 @@ public class BasketServiceTest {
         assertFalse(updatedBasket.values().stream().allMatch(basketContent::containsValue));
     }
 
+    @DisplayName("Delete an existing basket")
+    @Test
+    @Order(8)
+    void when_deleteBasketCalledWithExistingBasketId_thenReturn_deletedBasketId(){
+        var basketId = basketService.createBasket();
+        assertEquals(basketId, basketService.deleteBasket(basketId));
+    }
+
+    @DisplayName("Delete non-existing basket")
+    @Test
+    @Order(9)
+    void when_deleteBasketCalledWithNonExistingBasketId_thenThrow_BasketNotFoundException(){
+        assertThrows(RuntimeException.class, () -> basketService.deleteBasket(UUID.randomUUID()), "Basket Not Found");
+    }
+
+
+
     private BasketItem createSingleBasketItem() {
         Product macBookPro = new Product(UUID.randomUUID(), "MacBook Pro", new BigDecimal(1500), Currency.DOLLAR);
         return new BasketItem(macBookPro, (short) 1);
