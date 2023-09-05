@@ -86,8 +86,11 @@ public class BasketServiceTest {
         basketService.addItems(basketId, basketItems);
         var basketContent = basketService.getBasket(basketId);
         assertTrue(basketContent.values().stream().allMatch(basketItems::containsValue));
+
+        //The reason we don't use the returned basket content is to test the getBasket() method.
         basketService.addItem(basketId, createSingleBasketItem());
-        assertFalse(basketContent.values().stream().allMatch(basketItems::containsValue));
+        var updatedBasket = basketService.getBasket(basketId);
+        assertFalse(updatedBasket.values().stream().allMatch(basketContent::containsValue));
     }
 
     private BasketItem createSingleBasketItem() {
