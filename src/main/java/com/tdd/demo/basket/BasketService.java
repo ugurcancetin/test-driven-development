@@ -21,6 +21,15 @@ public class BasketService {
         return copyBasket(basketCollection.get(basketId));
     }
 
+    public UUID deleteBasket(UUID basketId){
+        if(!basketCollection.containsKey(basketId)) {
+            throw new RuntimeException("Basket Not Found");
+        }
+
+        basketCollection.remove(basketId);
+        return basketId;
+    }
+
     public Map<UUID, BasketItem> addItem(UUID basketId, BasketItem item) {
         var basket = basketCollection.get(basketId);
         if (basket == null) {
