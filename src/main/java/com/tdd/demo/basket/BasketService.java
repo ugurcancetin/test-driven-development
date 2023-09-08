@@ -4,6 +4,7 @@ import com.tdd.demo.basket.model.BasketItem;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -60,5 +61,22 @@ public class BasketService {
         } else {
             basket.put(basketItemId, basketItems.get(basketItemId));
         }
+    }
+
+    public BigDecimal getTotalCost(UUID basketId) {
+        //Another way of checking if the basket exists
+        if(!basketCollection.containsKey(basketId)) {
+            throw new RuntimeException("Basket Not Found");
+        }
+
+        return basketCollection.get(basketId).values()
+                .stream()
+                .map(basketItem -> calculateCost(basketItem.getQuantity(), basketItem.getProduct().getPrice()))
+                .reduce(BigDecimal::add)
+                .orElse(BigDecimal.valueOf(0));
+    }
+
+    private BigDecimal calculateCost(int itemQuantity, BigDecimal itemPrice) {
+        return itemPrice.multiply(BigDecimal.valueOf(itemQuantity));
     }
 }
