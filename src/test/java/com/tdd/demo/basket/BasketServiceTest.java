@@ -96,7 +96,7 @@ public class BasketServiceTest {
     @DisplayName("Delete an existing basket")
     @Test
     @Order(8)
-    void when_deleteBasketCalledWithExistingBasketId_thenReturn_deletedBasketId(){
+    void when_deleteBasketCalledWithExistingBasketId_thenReturn_deletedBasketId() {
         var basketId = basketService.createBasket();
         assertEquals(basketId, basketService.deleteBasket(basketId));
     }
@@ -104,11 +104,25 @@ public class BasketServiceTest {
     @DisplayName("Delete non-existing basket")
     @Test
     @Order(9)
-    void when_deleteBasketCalledWithNonExistingBasketId_thenThrow_BasketNotFoundException(){
+    void when_deleteBasketCalledWithNonExistingBasketId_thenThrow_BasketNotFoundException() {
         assertThrows(RuntimeException.class, () -> basketService.deleteBasket(UUID.randomUUID()), "Basket Not Found");
     }
 
+    @DisplayName("Get total cost of the basket")
+    @Test
+    @Order(10)
+    void when_getTotalCostBasketWithItemsInTheBasket_thenReturn_grandTotal() {
+        var basketId = basketService.createBasket();
+        var basketItem = createSingleBasketItem();
+        basketService.addItem(basketId, basketItem);
 
+        var totalCost = basketItem.getProduct().getPrice().multiply(BigDecimal.valueOf(basketItem.getQuantity()));
+        assertEquals(totalCost, basketService.getTotalCost(basketId));
+
+        basketService.addItem(basketId, basketItem);
+        var newTotalCost = totalCost.add(totalCost);
+        assertEquals(newTotalCost, basketService.getTotalCost(basketId));
+    }
 
     private BasketItem createSingleBasketItem() {
         Product macBookPro = new Product(UUID.randomUUID(), "MacBook Pro", new BigDecimal(1500), Currency.DOLLAR);
